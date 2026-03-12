@@ -18,6 +18,13 @@ class LocationController extends Controller
             'latitude' => 'required',
             'longitude' => 'required',
         ]);
-        return view('location-tracker');
+        $userId = session()->getId();
+
+        broadcast(new LocationUpdated(
+            $userId,
+            $validated['latitude'],
+            $validated['longitude'],
+        ));
+        return response()->json(['sucess'=>true, 'message'=>'Location Updated']);
     }
 }

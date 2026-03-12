@@ -10,16 +10,22 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class LocationUpdated
+class LocationUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    public $userId;
+    public $latitude;
+    public $longitude;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($userId, $latitude, $longitude)
     {
-        //
+        $this->userId = $userId;
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
+        
     }
 
     /**
@@ -30,7 +36,25 @@ class LocationUpdated
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new Channel('location-tracking'),
         ];
+    }
+    
+    public function broadcastAs(): string
+    {
+        return 'location-updated';
+        
+    }
+    
+    public function broadcastWith(): array
+    {
+        return 
+        [
+            'userId'=>$this->userId,
+            'latitude'=>$this->latitude,
+            'longitude'=>$this->longitude,
+            
+        ];
+        
     }
 }
